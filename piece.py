@@ -43,7 +43,7 @@ class piece:
              newRow = move // SIZE
              newCol = move % SIZE
              newRect = pygame.Rect(newCol * SQSIZE, newRow * SQSIZE, SQSIZE, SQSIZE)
-             pygame.draw.circle(win, pygame.Color('black'), newRect.center, 20)
+             pygame.draw.circle(win, pygame.Color('black'), newRect.center, 15)
     def draw_piece(self, win, row, col):
         if self.color == "w":
             drawThis = w[self.img]
@@ -160,18 +160,26 @@ class Pawn(piece):
                 if board[pos + (2*index)] == None:
                     self.squares.append(pos + (2*index))
             if board[pos+index-1] != None:
+                if self.CheckEdgeV2(pos, index-1):
+                    return
                 if self.color != board[pos+index-1].color:
                     self.squares.append(pos+index-1)
             if board[pos+index+1] != None:
+                if self.CheckEdgeV2(pos, index+1):
+                    return
                 if self.color != board[pos+index+1].color:
                     self.squares.append(pos+index+1)
         else:
             if board[pos+index] == None:
                 self.squares.append(pos + index)
             if board[pos+index+1] != None:
+                if self.CheckEdgeV2(pos, index+1):
+                    return
                 if self.color != board[pos+index+1].color:
                     self.squares.append(pos+index+1)
             if board[pos+index-1] != None:
+                if self.CheckEdgeV2(pos, index-1):
+                    return
                 if self.color != board[pos+index-1].color:
                     self.squares.append(pos+index-1)
         return self.squares
