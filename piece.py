@@ -218,6 +218,12 @@ class Knight(piece):
     
 class King(piece):
     img = 4
+    def __init__(self, color, pos):
+        super().__init__(color, pos)
+        self.Short_Castle = False
+        self.Long_Castle = False
+        self.Checked = False
+
     def generate_legal_squares(self, board):
         self.squares.clear()
         row = self.pos // SIZE
