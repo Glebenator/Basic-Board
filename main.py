@@ -15,7 +15,7 @@ class Main:
         pygame.display.flip()
 
     def mainloop(self):
-        self.game.brd.LoadPosFromFen(StartingFen)
+        self.game.brd.LoadPosFromFen(StartFen)
         self.redraw_gamewindow(self.game.brd)
         run = True
         while run:
