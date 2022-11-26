@@ -33,6 +33,7 @@ class piece:
         self.selected = False
         self.squares = []
         self.drag = False
+        self.hasMoved = False
     def move(self):
         pass
     def isSelected(self):
@@ -144,7 +145,6 @@ class Pawn(piece):
     img = 0
     def __init__(self, color, pos):
         super().__init__(color, pos)
-        self.first = True
         self.queen = False
     def generate_legal_squares(self,board):
         self.squares.clear()
@@ -153,7 +153,7 @@ class Pawn(piece):
         index = SIZE
         if self.color == "b":
             index = SIZE * -1
-        if self.first:
+        if self.hasMoved == False:
             #if this is a first pawn moves, legal squares are 1 or 2 squares ahead, unless there is a piece in front.
             if board[pos+index] == None:
                 self.squares.append(pos+index)
@@ -223,6 +223,14 @@ class King(piece):
         self.Short_Castle = False
         self.Long_Castle = False
         self.Checked = False
+    def canShort_Castle(self):
+        if self.hasMoved:
+            return False
+        else: return True
+    def canLong_Castle(self):
+        if self.hasMoved:
+            return False
+        else: return True
 
     def generate_legal_squares(self, board):
         self.squares.clear()
@@ -238,6 +246,15 @@ class King(piece):
                 if board[board_pos] != None:
                     if board[board_pos].color != self.color:
                         self.squares.append(board_pos)
+        if self.canShort_Castle():
+            print(board[self.pos + 1])
+            if board[self.pos + 1] == None and board[self.pos + 2] == None:
+                if isinstance(board[self.pos + 3], Rook) and board[self.pos + 3].hasMoved == False:
+                    self.squares.append(self.pos + 3)
+        if self.canLong_Castle():
+            if board[self.pos - 1] == None and board[self.pos - 2] == None and board[self.pos - 3] == None:
+                if isinstance(board[self.pos - 4], Rook) and board[self.pos - 4].hasMoved == False:
+                    self.squares.append(self.pos - 4)
 class Queen(piece):
     img = 5
     def generate_legal_squares(self,board):

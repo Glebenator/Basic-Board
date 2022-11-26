@@ -78,24 +78,43 @@ class Board:
         col = sq % SIZE
         for square in enumerate(sq):
             pygame.draw.circle()
-
+    def Castle(self, kingPos, rookPos):
+        if rookPos - kingPos == 3:
+            #short castle
+            self.performMove(kingPos, kingPos + 2)
+            self.performMove(rookPos, rookPos - 2)
+            self.incrementMove()
+            pass
+        if rookPos - kingPos == -4:
+            #long Castle
+            self.performMove(kingPos, kingPos - 2)
+            self.performMove(rookPos, rookPos + 3)
+            self.incrementMove()
+            pass
     def move(self, origPos, newPos):
         if self.board[origPos].color == self.turn:
             self.board[origPos].selected = False
-            self.board[origPos].pos = newPos
-            if isinstance(self.board[origPos], Pawn):
-                self.board[origPos].first = False
-            #$print(newPos // SIZE, newPos % SIZE)
-            self.board[newPos] = self.board[origPos]
-            self.board[origPos] = None
-            if self.turn == "w":
-                self.turn = "b"
-            else: self.turn = "w"
-            self.numMoves = self.numMoves + 0.5
-            if self.numMoves.is_integer():
-                print(self.numMoves)
+            if isinstance(self.board[origPos], King):
+                if isinstance(self.board[newPos], Rook):
+                    self.Castle(origPos, newPos)
+                    return
+            self.performMove(origPos, newPos)
+            self.incrementMove()
         else: return
-        
+    def incrementMove(self):
+        if self.turn == "w":
+            self.turn = "b"
+        else: self.turn = "w"
+        self.numMoves = self.numMoves + 0.5
+        if self.numMoves.is_integer():
+            #print(self.numMoves)
+            pass
+    def performMove(self, origPos, newPos):
+        self.board[origPos].pos = newPos
+        self.board[newPos] = self.board[origPos]
+        if self.board[origPos].hasMoved == False:
+            self.board[origPos].hasMoved = True
+        self.board[origPos] = None
     def select(self, pos):
         #if pos clicked is an empty square, and not a legal move for previously selected, clear selected. If it is, move the piece there, then clear selected
         for piece,p in enumerate(self.board):
