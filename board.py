@@ -6,12 +6,26 @@ from piece import Pawn
 from piece import Queen
 from piece import Rook
 from consts import *
+def charPostoBoardPos(str):
+    #e3 should be 20
+    PosDict = {
+        'a':0,
+        'b':1,
+        'c':2,
+        'd':3,
+        'e':4,
+        'f':5,
+        'g':6,
+        'h':7
+    }
+    return ((int(str[1])-1) * SIZE + PosDict[str[0]])
 class Board:
     def __init__(self):
         self.board = ((SIZE * SIZE))*[None]
         self.turn = "w"
         self.HalfMove = 0
         self.numMoves = 0
+        self.EP_square = None
         #self.board.insert(0,Rook("b", 0, self.width, self.size))
         #self.board.insert(7,Rook("b", 7, self.width, self.size))
     
@@ -30,6 +44,9 @@ class Board:
         self.turn = splitFen[1]
         self.HalfMove = int(splitFen[4])
         self.numMoves = int(splitFen[5])
+        if splitFen[3] != '-':
+            self.EP_square = charPostoBoardPos(splitFen[3])
+            print(self.EP_square)
         for char in splitFen[0]:
             if char == '/':
                 file = 0
