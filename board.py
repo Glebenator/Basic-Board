@@ -6,7 +6,7 @@ from piece import Pawn
 from piece import Queen
 from piece import Rook
 from consts import *
-def charPostoBoardPos(str):
+def charPosToBoardPos(str):
     #e3 should be 20
     PosDict = {
         'a':0,
@@ -45,8 +45,8 @@ class Board:
         self.HalfMove = int(splitFen[4])
         self.numMoves = int(splitFen[5])
         if splitFen[3] != '-':
-            self.EP_square = charPostoBoardPos(splitFen[3])
-            print(self.EP_square)
+            self.EP_square = charPosToBoardPos(splitFen[3])
+            #print(self.EP_square)
         for char in splitFen[0]:
             if char == '/':
                 file = 0
@@ -113,15 +113,35 @@ class Board:
             self.board[origPos].selected = False
             if isinstance(self.board[origPos], King):
                 if isinstance(self.board[newPos], Rook):
-                    self.Castle(origPos, newPos)
-                    return
+                    if self.board[origPos].color == self.board[newPos].color:
+                        self.Castle(origPos, newPos)
+                        return
+            if newPos == self.EP_square:
+                #here just need to delete the pawn above/below the EP square
+                if self.board[origPos].color == "w":
+                    #EP square should be "above" the pawn. 
+                    self.board[newPos - SIZE] = None
+                else: self.board[newPos + SIZE] = None
             self.performMove(origPos, newPos)
             self.incrementMove()
+            if isinstance(self.board[newPos], Pawn):
+                #adding en passant Square
+                if abs(newPos - origPos) == 2 * SIZE:
+                    #if the pawn moved 2 squares # the squared it skipped is the EP square
+                    if self.board[newPos].color == 'w':
+                        if origPos//SIZE != 1:
+                            return
+                        else: self.EP_square = origPos + SIZE
+                    elif self.board[newPos].color == 'b':
+                        if origPos//SIZE != 7:
+                            self.EP_square = origPos - SIZE
         else: return
     def incrementMove(self):
         if self.turn == "w":
             self.turn = "b"
         else: self.turn = "w"
+        if self.EP_square != None:
+            self.EP_square = None
         self.numMoves = self.numMoves + 0.5
         if self.numMoves.is_integer():
             #print(self.numMoves)
@@ -144,6 +164,6 @@ class Board:
         if self.board[pos]:
             if self.board[pos].color == self.turn:
                 self.board[pos].selected  = True
-                self.board[pos].generate_legal_squares(self.board)
+                self.board[pos].generate_legal_squares(self.board, self.EP_square)
                 return self.board[pos]
             else: return
