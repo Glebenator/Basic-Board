@@ -146,46 +146,56 @@ class Pawn(piece):
     def __init__(self, color, pos):
         super().__init__(color, pos)
         self.queen = False
-    def generate_legal_squares(self,board):
+    def HasMoved(self):
+        if self.color == "w":
+            if self.pos // SIZE != 1:
+                return True
+            else: return False
+        else:
+            if self.pos // SIZE != 6:
+                return True
+            else: return False
+    def generate_legal_squares(self,board,EP_square):
         self.squares.clear()
         pos = self.pos
-        b = board
         index = SIZE
         if self.color == "b":
             index = SIZE * -1
-        if self.hasMoved == False:
+        if self.HasMoved() == False:
             #if this is a first pawn moves, legal squares are 1 or 2 squares ahead, unless there is a piece in front.
             if board[pos+index] == None:
-                self.squares.append(pos+index)
                 if board[pos + (2*index)] == None:
                     self.squares.append(pos + (2*index))
-            if board[pos+index-1] != None:
-                if self.CheckEdgeV2(pos, index-1):
-                    return
-                if self.color != board[pos+index-1].color:
-                    self.squares.append(pos+index-1)
-            if board[pos+index+1] != None:
-                if self.CheckEdgeV2(pos, index+1):
-                    return
-                if self.color != board[pos+index+1].color:
-                    self.squares.append(pos+index+1)
-        else:
-            if board[pos+index] == None:
-                self.squares.append(pos + index)
-            if board[pos+index+1] != None:
-                if self.CheckEdgeV2(pos, index+1):
-                    return
-                if self.color != board[pos+index+1].color:
-                    self.squares.append(pos+index+1)
-            if board[pos+index-1] != None:
-                if self.CheckEdgeV2(pos, index-1):
-                    return
-                if self.color != board[pos+index-1].color:
-                    self.squares.append(pos+index-1)
-        return self.squares
+
+        if board[pos+index] == None:
+            self.squares.append(pos + index)
+
+        if board[pos+index-1] != None:
+            if self.CheckEdgeV2(pos, index-1):
+                return
+            if self.color != board[pos+index-1].color:
+                self.squares.append(pos+index-1)
+
+        if pos+index-1 == EP_square:
+            if self.CheckEdgeV2(pos, index-1):
+                return
+            self.squares.append(pos+index-1)
+
+        if board[pos+index+1] != None:
+            if self.CheckEdgeV2(pos, index+1):
+                return
+            if self.color != board[pos+index+1].color:
+                self.squares.append(pos+index+1)
+
+        if pos+index+1 == EP_square:
+            if self.CheckEdgeV2(pos, index+1):
+                return
+            self.squares.append(pos+index+1)
+
+
 class Rook(piece):
     img = 1
-    def generate_legal_squares(self,board):
+    def generate_legal_squares(self,board, ep):
         self.squares.clear()
         self.slide(board, SIZE)
         self.slide(board, (SIZE * -1))
@@ -193,7 +203,7 @@ class Rook(piece):
         self.slide(board, (-1))
 class Bishop(piece):
     img = 2
-    def generate_legal_squares(self,board):
+    def generate_legal_squares(self,board, ep):
         self.squares.clear()
         self.slide(board, SIZE + 1)
         self.slide(board, SIZE - 1)
@@ -201,7 +211,7 @@ class Bishop(piece):
         self.slide(board, (SIZE * -1) - 1 )
 class Knight(piece):
     img = 3
-    def generate_legal_squares(self,board):
+    def generate_legal_squares(self,board, ep):
         self.squares.clear()
         row = self.pos // SIZE
         col = self.pos % SIZE
@@ -232,7 +242,7 @@ class King(piece):
             return False
         else: return True
 
-    def generate_legal_squares(self, board):
+    def generate_legal_squares(self, board, ep):
         self.squares.clear()
         row = self.pos // SIZE
         col = self.pos % SIZE
@@ -247,7 +257,7 @@ class King(piece):
                     if board[board_pos].color != self.color:
                         self.squares.append(board_pos)
         if self.canShort_Castle():
-            print(board[self.pos + 1])
+            #print(board[self.pos + 1])
             if board[self.pos + 1] == None and board[self.pos + 2] == None:
                 if isinstance(board[self.pos + 3], Rook) and board[self.pos + 3].hasMoved == False:
                     self.squares.append(self.pos + 3)
@@ -257,7 +267,7 @@ class King(piece):
                     self.squares.append(self.pos - 4)
 class Queen(piece):
     img = 5
-    def generate_legal_squares(self,board):
+    def generate_legal_squares(self,board, ep):
         self.squares.clear()
         self.slide(board, SIZE + 1)
         self.slide(board, SIZE - 1)
