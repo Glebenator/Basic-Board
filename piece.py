@@ -145,7 +145,6 @@ class Pawn(piece):
     img = 0
     def __init__(self, color, pos):
         super().__init__(color, pos)
-        self.queen = False
     def HasMoved(self):
         if self.color == "w":
             if self.pos // SIZE != 1:
@@ -168,6 +167,8 @@ class Pawn(piece):
                     self.squares.append(pos + (2*index))
 
         if board[pos+index] == None:
+            if self.CheckEdgeV2(pos, index):
+                return
             self.squares.append(pos + index)
 
         if board[pos+index-1] != None:

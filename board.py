@@ -108,6 +108,7 @@ class Board:
             self.performMove(rookPos, rookPos + 3)
             self.incrementMove()
             pass
+
     def move(self, origPos, newPos):
         if self.board[origPos].color == self.turn:
             self.board[origPos].selected = False
@@ -133,8 +134,15 @@ class Board:
                             return
                         else: self.EP_square = origPos + SIZE
                     elif self.board[newPos].color == 'b':
-                        if origPos//SIZE != 7:
-                            self.EP_square = origPos - SIZE
+                        if origPos//SIZE != 6:
+                            return
+                        else: self.EP_square = origPos - SIZE
+                if self.board[newPos].color == 'w':
+                    if newPos//SIZE == 7:
+                        self.board[newPos] = Queen('w', newPos)
+                if self.board[newPos].color == 'b':
+                   if newPos//SIZE == 0:
+                       self.board[newPos] = Queen('b', newPos)
         else: return
     def incrementMove(self):
         if self.turn == "w":
